@@ -1,0 +1,26 @@
+---
+title: "**An Evaluation of the Causal Effect of Paid Facebook Posts on Post Interactions**"
+subtitle: |
+  | Febriany Lete
+  | Maysen Pagan
+date: April 2024
+  
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: true
+    linkcolor: blue
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+# Methods
+
+# Analysis
+
+# Conclusion
