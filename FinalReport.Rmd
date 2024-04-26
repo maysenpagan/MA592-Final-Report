@@ -1,5 +1,5 @@
 ---
-title: "**An Evaluation of the Causal Effect of Paid Facebook Posts on Interactions**"
+title: "**An Evaluation of the Causal Effect of a Promotion Campaign on Software Usage**"
 subtitle: |
   | Febriany Lete
   | Maysen Pagan
@@ -19,11 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-In the current period of constant internet and technological growth, social media has emerged as a platform that has transformed not only the way people interact with one another but also how they purchase items. Social media platforms can be used by individuals for networking and expression as well as by businesses for promoting their products and services. It introduced to businesses a new way of increasing brand awareness, engaging with their customers, and targeting their advertising in order to improve sales. 
-
-Social media platforms offer businesses the opportunity to pay for their posts so that it might effectively reach a target audience and increase engagement. These platforms also often provide metrics such as likes, comments, and shares that allow companies to evaluate the performance of their posts. A question then follows from these social media features: Do company advertisements have a causal effect on the engagement performance of social media posts? Evaluating this question through various causal inference frameworks can help businesses determine if they should continue to invest their money and resources on social media advertising.
-
-The data that we will be using for this analysis comes from a paper that aimed to predict social media performance metrics. The [Facebook Metrics](https://archive.ics.uci.edu/dataset/368/facebook+metrics) data set contains 500 of 790 posts published on Facebook by a renowned cosmetics brand during the year of 2014. The other 290 posts were omitted due to confidentiality reasons.
+# Exploratory Data Analysiss
 
 # Methods
 
