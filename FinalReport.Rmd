@@ -30,6 +30,8 @@ promo <- read.csv("promotion.csv")
 
 # Introduction
 
+  In an era marked by the digital transformation of businesses, startups are increasingly reliant on strategic outreach efforts to both attract new customers and cultivate loyalty among existing ones. Within this landscape, one such startup, specializing in software solutions, has embarked on a comprehensive analysis to discern the efficacy of its multifaceted outreach endeavors. A software startup aims to boost usage among its existing customers by offering discounts. To gauge the impact of these discounts on customer usage, the company examines historical data from 2000 customers. The key variables in the dataset include a binary treatment variable indicating whether a customer received a discount and a response variable representing the revenue generated from software purchases in the year following the discount. Additionally, there are several pre-treatment covariates such as the number of PCs used by the customer, the company's employee count, the amount spent on IT purchases, the company's size (measured by total yearly revenue), and some binary flags indicating factors which are whether the customer has global offices, whether the customer is a Small Medium Corporation (SMC, as opposed to major and SMB), and whether the customer's business is commercial (as opposed to public sector). 
+
 # Exploratory Data Analysis
 
 Before performing any causal analysis, we first explore the data for any missing values or outliers. There are no missing values in our data set, however, from a histogram of our response variable, we can see there exists one value that is negative. Since it is unknown if the revenue from this customer was input incorrectly and there is only one observation where the revenue is less than 0, we will remove this customer from our data set.
@@ -98,7 +100,8 @@ We then performed sensitivity analysis to observe the extent to which the Condit
 
 # Conclusion
 
-
+1. The causal analysis revealed a significant increase of approximately $5,500 in revenue among customers who received the discount compared to those who did not. This indicates a positive average treatment effect (ATE) of the discount on revenue generation.
+2. Sensitivity analysis indicates that our estimated causal effect is primarily sensitive to higher levels of unmeasured confounding. Despite this sensitivity, our analysis provides confidence in the existence of a causal effect, although the accuracy of the estimated ATE may be subject to some degree of inaccuracy.
 
 \newpage
 # Appendix
