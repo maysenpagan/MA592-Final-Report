@@ -32,14 +32,21 @@ promo <- read.csv("promotion.csv")
 
 # Exploratory Data Analysis
 
-Before performing any causal analysis, we first explore the data by looking at a correlation matrix of our quantitative variables. 
+Before performing any causal analysis, we first explore the data for any missing values or outliers. There are no missing values in our data set, however, from a histogram of our response variable, we can see there exists one value that is negative. Since it is unknown if the revenue from this customer was input incorrectly and there is only one observation where the revenue is less than 0, we will remove this customer from our data set.
 
 ```{r, echo = FALSE}
-cormat <- round(cor(promo[,5:8]),2)
+hist(promo$Revenue, breaks = 15, main = "Figure 1. Histogram of Revenue Response Variable", xlab = "Revenue")
+
+promo <- promo %>% filter(Revenue>0)
+```
+
+Next, we look at a correlation matrix of our quantitative variables. 
+
+```{r, echo = FALSE}
+cormat <- round(cor(promo[,c(5,6,7,8,11)]),2)
 cormat
 ```
 From this matrix, we can see a strong linear association of 0.95 between the number of PCs a customer has and the number of employees a customer has. Similarly, there is a large correlation of 0.88 between the size of the customer, given by their yearly total revenue, and the dollars spent on IT purchases by the customer. As a result, we choose to omit the dollars spend on IT purchases and the number of PCs the customer has from further analysis. 
-
 
 # Methods and Analysis
 
@@ -69,11 +76,29 @@ $\{Y^{(0)}, Y^{(1)}\} \newcommand{\indep}{\perp \!\!\! \perp} A|X$
 
 ## Estimation
 
-Under the above assumptions, which are known as the three main identification assumptions, our parameter of interest can be identified and then estimated using the Outcome Regression estimator, the Inverse Probability Weighting estimator, the Hajek estimator as well as the Doubly Robust estimator.
+Under the above assumptions, which are known as the three main identification assumptions, our parameter of interest, the average treatment effect (ATE), can be identified and then estimated using the Outcome Regression (OR) estimator, the Inverse Probability Weighting (IPW) estimator, the Hajek estimator as well as the Doubly Robust (DR) estimator.
+
+We first use the simplest estimator for the ATE which is the (OR) Estimator. We also choose to estimate $\hat{\mu}$ for the OR function using linear regression with ordinary least squares estimator with $(1, A, X)$ as predictors. We then use non-parametric bootstrap to estimate the standard error and obtain confidence intervals for the OR estimator.
+
+Rather than modeling the outcome mechanism, we also model the treatment assignment mechanism using propensity score in the IPW Estimator. This method is often used when partial information is available about the treatment assignment. In campaign problem, we are not certain of how the company chose which customers to provide discounts to. Non-parametric bootstrap was also used to estimate standard error and obtain confidence intervals.
+
+The IPW approach, however, is not invariant to location transformation of the outcome and also is not stable leading to high variance. Therefore, we also calculate the ATE using the Hajek estimator which is invariant to location transformation of the outcome and is more stable (although this means it also has increased bias). Non-parametric bootstrap was used to estimate standard error and obtain confidence intervals.
+
+The OR function in the OR Estimator represents the outcome mechanism while the propensity score in the IPW and Hajek Estimators represents the treatment assignment mechanism. We also estimate the ATE using the DR Estimator which combines both information and is unbiased if either the OR function or the propensity score is correctly specified. Similar to the previous estimators, non-parametric bootstrap was used to estimate standard error and obtain confidence intervals.
+
+The propensity score was estimated using logistic regression with an order 1 polynomial. For each of the covariates, the estimated propensity scores were used to calculate $\frac{1}{n}\sum_{i=1}^{n}\{\frac{A_i}{\hat{\pi}(x_i)}-1\}\hspace{0.1cm}X_{i_{p}}$ for $p$ = 1,2,...,6 for 6 predictors. Bootstrap was used to calculate 1000 of these values for each covariate and 95% confidence intervals were produced. The results are shown in the table below. From this table, we can see that the value 0 falls in every confidence interval which suggests that my estimator of the propensity score satisfies the weighted balancing property for each of the covariates.
+
+Table 2 displays the ATE estimates, bootstrap standard errors, and bootstrap confidence intervals using the four methods above. 
+
+From this table, we can see that all of the 95% bootstrap confidence intervals do not contain zero suggesting that there is a positive causal effect between giving a customer a discount and the revenue received from that customer. We focus on the DR estimator because only one of the OR function or propensity score needs to be correctly specified for the estimator to be unbiased. We observe that the ATE is about 5,500 which means that on average, customers who received the discount would give the company $5,500 more in revenue than those who did not receive the discount.
 
 ## Sensitivity Analysis
 
+We then performed sensitivity analysis to observe the extent to which the Conditional Exchangeability assumption might be violated. We chose our sensitivity parameters to range from $\frac{1}{2}$ to 2 and Figure 1 is a heatmap of the calculated effects with certain combinations of these parameters. We can see from the bottom right corner of the heatmap that the signs of our ATEs are sensitive only for larger sensitivity parameters. This suggests that when customers who receive a discount tend to bring in more revenue (which means the sensitivity parameters are larger than 1), then our results are sensitive. On the other hand, for customers who receive a discount and tend to bring in less revenue, our results are not sensitive and we can conclude that there is a positive causal effect.
+
 # Conclusion
+
+
 
 \newpage
 # Appendix
