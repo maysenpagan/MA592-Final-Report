@@ -17,12 +17,91 @@ urlcolor: blue
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, echo = FALSE}
+#libraries
+suppressPackageStartupMessages(library(tidyverse))
+library(boot)
+library(DescTools)
+suppressPackageStartupMessages(library(reshape2))
+suppressPackageStartupMessages(library(kableExtra))
+#read data
+promo <- read.csv("promotion.csv")
+```
+
 # Introduction
 
-# Exploratory Data Analysiss
+# Exploratory Data Analysis
 
-# Methods
+Before performing any causal analysis, we first explore the data by looking at a correlation matrix of our quantitative variables. 
 
-# Analysis
+```{r, echo = FALSE}
+cormat <- round(cor(promo[,5:8]),2)
+cormat
+```
+From this matrix, we can see a strong linear association of 0.95 between the number of PCs a customer has and the number of employees a customer has. Similarly, there is a large correlation of 0.88 between the size of the customer, given by their yearly total revenue, and the dollars spent on IT purchases by the customer. As a result, we choose to omit the dollars spend on IT purchases and the number of PCs the customer has from further analysis. 
+
+
+# Methods and Analysis
+
+## Assumptions
+
+We then consider the three main identification assumptions to identify our average treatment effect: Positivity, Consistency, and Conditional Exchangeability.
+
+### Positivity
+
+For the Positivity assumption, we observed the covariate balance plots for each of our covariates, comparing the distribution of the values between the treatment and control. These plots can be viewed in the Appendix. All plots show the pattern of an equal distribution of covariate values between those customers who received the discount and those who did not. For example, the first covariate balance plot for the employee count variable displays a skewed right distribution with the count ranging from 0 to about 500 employees both for customers who received a discount and customers who did not receive a discount. This demonstrates that for given values of each of the covariates, the probability of receiving the treatment and control are both non-zero. Therefore, 
+
+$0<p(A = a|X)<1,\:a\in\{0,1\}$
+
+### Consistency
+
+We will also perform our causal analysis under the Consistency assumption which states that a customer's potential outcome under the observed treatment assignment is equal to the observed outcome for that customer. Therefore,
+
+If $A_i = a,$ then $Y_i = Y_i^{(a)}$
+
+### Conditional Exchangeability
+
+For the Conditional Exchangeability assumption, we thought of possible variables that could be a confounder of the treatment-outcome relation. We believe that the size of the customer could be this confounder. The startup company might tend to give discounts to larger companies either to keep their loyalty or prevent them from purchasing from their competitors. In this sense, the size of the customer directly affects the treatment assignment. Additionally, the size of the customer may also directly affect the outcome because, for example, larger customers will most likely purchase more software than smaller customers and therefore bring in more revenue for the company.
+
+However, this size of the customer confounder can be observed in our data set through variables such as the number of employees the customer has or the binary variable that indicates if the customer has global offices. Larger businesses tend to have more employees as well as global offices. Since this confounder can be observed in our data set, we continue with the assumption of Conditional Exchangeability which states
+
+$\{Y^{(0)}, Y^{(1)}\} \newcommand{\indep}{\perp \!\!\! \perp} A|X$
+
+## Estimation
+
+Under the above assumptions, which are known as the three main identification assumptions, our parameter of interest can be identified and then estimated using the Outcome Regression estimator, the Inverse Probability Weighting estimator, the Hajek estimator as well as the Doubly Robust estimator.
+
+## Sensitivity Analysis
 
 # Conclusion
+
+\newpage
+# Appendix
+```{r, echo = FALSE, fig.height=8}
+#covariate balance check
+treatment <- promo %>% filter(Discount==1)
+control <- promo %>% filter(Discount==0)
+par(mfrow=c(3,2))
+#number of employees
+hist(treatment$Employee.Count, main = "Employee Count Under Treatment", xlab = "Employee Count")
+hist(control$Employee.Count, main = "Employee Count Under Control", xlab = "Employee Count")
+#customer's size given by their yearly total revenue
+hist(log(treatment$Size), main = "Customer Size Under Treatment", xlab = "Customer Size")
+hist(log(control$Size), main = "Customer Size Under Control", xlab = "Customer Size")
+#whether the customer's business is commercial
+hist(treatment$Commercial.Flag, main = "Commercial Flag Under Treatment", xlab = "Commercial Flag")
+hist(control$Commercial.Flag, main = "Commercial Flag Under Control", xlab = "Commercial Flag")
+```
+
+```{r, echo = FALSE, fig.height=8}
+#whether the customer is a Small Medium Corporation
+par(mfrow=c(3,2))
+hist(treatment$SMC.Flag, main = "Small Medium Corporation Flag Under Treatment", xlab = "Small Medium Corporation Flag")
+hist(control$SMC.Flag, main = "Small Medium Corporation Flag Under Control", xlab = "Small Medium Corporation Flag")
+#whether the customer is a large consumer in their industry
+hist(treatment$Major.Flag, main = "Large Consumer Flag Under Treatment", xlab = "Large Consumer Flag")
+hist(control$Major.Flag, main = "Large Consumer Flag Under Control", xlab = "Large Consumer Flag")
+#whether the customer has global offices
+hist(treatment$Global.Flag, main = "Global Offices Flag Under Treatment", xlab = "Global Offices Flag")
+hist(control$Global.Flag, main = "Global Offices Flag Under Control", xlab = "Global Offices Flag")
+```
