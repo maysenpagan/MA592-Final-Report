@@ -1,7 +1,7 @@
 ---
-title: "Software Startup"
+title: "R Code for An Evaluation of the Causal Effect of a Promotion Campaign on Software Usage"
 author: "Febriany & Maysen"
-date: "2024-04-16"
+date: "April 2024"
 output:
   pdf_document: default
   html_document: default
@@ -20,12 +20,55 @@ library(haven)
 
 ```{r, eval=FALSE}
 set.seed(123)
-msdata <- read_csv("multi_attribution_sample.csv")
+msdata <- read_csv("promotion.csv")
 msdata <- msdata %>% filter(Revenue>0)
 size<-floor(dim(msdata)[1]*0.5)
 samp_idx <-sample(1:dim(msdata)[1],size,FALSE)
 first_fold <- msdata[samp_idx,]
 second_fold <- msdata[-samp_idx,]
+```
+**Covariate Balance Check**
+
+```{r, eval = FALSE}
+#covariate balance check
+treatment <- msdata %>% filter(Discount==1)
+control <- msdata %>% filter(Discount==0)
+#customer's size given by their yearly total revenue
+par(mfrow=c(2,2))
+hist(log(treatment$Size), main = "Customer Size Under Treatment", 
+     xlab = "Customer Size")
+hist(log(control$Size), main = "Customer Size Under Control", 
+     xlab = "Customer Size")
+#number of employees
+par(mfrow=c(2,1))
+hist(treatment$`Employee Count`, main = "Employee Count Under Treatment", 
+     xlab = "Employee Count")
+hist(control$`Employee Count`, main = "Employee Count Under Control", 
+     xlab = "Employee Count")
+#whether the customer's business is commercial
+par(mfrow=c(2,2))
+hist(treatment$`Commercial Flag`, main = "Commercial Flag Under Treatment", 
+     xlab = "Commercial Flag")
+hist(control$`Commercial Flag`, main = "Commercial Flag Under Control", 
+     xlab = "Commercial Flag")
+#whether the customer is a Small Medium Corporation
+par(mfrow=c(2,2))
+hist(treatment$`SMC Flag`, main = "Small Medium Corporation Flag Under Treatment", 
+     xlab = "Small Medium Corporation Flag")
+hist(control$`SMC Flag`, main = "Small Medium Corporation Flag Under Control", 
+     xlab = "Small Medium Corporation Flag")
+#whether the customer is a large consumer in their industry
+par(mfrow=c(2,2))
+hist(treatment$`Major Flag`, main = "Large Consumer Flag Under Treatment", 
+     xlab = "Large Consumer Flag")
+hist(control$`Major Flag`, main = "Large Consumer Flag Under Control", 
+     xlab = "Large Consumer Flag")
+#whether the customer has global offices
+par(mfrow=c(2,2))
+hist(treatment$`Global Flag`, main = "Global Offices Flag Under Treatment", 
+     xlab = "Global Offices Flag")
+hist(control$`Global Flag`, main = "Global Offices Flag Under Control", 
+     xlab = "Global Offices Flag")
 ```
 
 **OR Estimator**
@@ -161,6 +204,7 @@ text(5690, 60, "5661")
 text(5380, 60, "5407")
 ```
 **Sensitivity Analysis**
+
 ```{r, eval=FALSE}
 set.seed(123)
 
@@ -210,7 +254,139 @@ for (i in seq_along(E0)) {
 print(ate_values)
 
 ```
-Heatmap for sensitivity analysis
+**Weighted Balancing Property Check**
+
+```{r, eval = FALSE}
+#check if propensity score model satisfies weighted balancing property
+global_prop <- function(data, indices){
+  data2 <- data[indices,]
+  set.seed(123)
+  inds <- sample(seq_len(nrow(data2)), size = nrow(data2)/2)
+  #split data into two folds
+  nuisance <- data2[inds,]
+  effect <- data2[-inds,]
+  
+  #estimate propensity score on nuisance fold
+  #model for the propensity score (logistic regression of treatment on all covariates)
+  prop_mod <- glm(Discount ~ .-Revenue, family = binomial(link="logit"), data = nuisance)
+  #predict propensity scores on effect fold
+  pi_hat <- predict(prop_mod, effect, type = "response")
+  #check weighted balancing property on effect fold
+  wbp <- mean(((effect$Discount/pi_hat)-1)*effect$`Global Flag`)
+  return(wbp)
+}
+
+bs <- suppressWarnings(boot(msdata, global_prop, R = 1000))
+quantile(bs$t, probs = c(0.025, 0.975))
+
+major_prop <- function(data, indices){
+  data2 <- data[indices,]
+  set.seed(123)
+  inds <- sample(seq_len(nrow(data2)), size = nrow(data2)/2)
+  #split data into two folds
+  nuisance <- data2[inds,]
+  effect <- data2[-inds,]
+  
+  #estimate propensity score on nuisance fold
+  #model for the propensity score (logistic regression of treatment on all covariates)
+  prop_mod <- glm(Discount ~ .-Revenue, family = binomial(link="logit"), data = nuisance)
+  #predict propensity scores on effect fold
+  pi_hat <- predict(prop_mod, effect, type = "response")
+  #check weighted balancing property on effect fold
+  wbp <- mean(((effect$Discount/pi_hat)-1)*effect$`Major Flag`)
+  return(wbp)
+}
+
+bs <- suppressWarnings(boot(msdata, major_prop, R = 1000))
+quantile(bs$t, probs = c(0.025, 0.975))
+
+SMC_prop <- function(data, indices){
+  data2 <- data[indices,]
+  set.seed(123)
+  inds <- sample(seq_len(nrow(data2)), size = nrow(data2)/2)
+  #split data into two folds
+  nuisance <- data2[inds,]
+  effect <- data2[-inds,]
+  
+  #estimate propensity score on nuisance fold
+  #model for the propensity score (logistic regression of treatment on all covariates)
+  prop_mod <- glm(Discount ~ .-Revenue, family = binomial(link="logit"), data = nuisance)
+  #predict propensity scores on effect fold
+  pi_hat <- predict(prop_mod, effect, type = "response")
+  #check weighted balancing property on effect fold
+  wbp <- mean(((effect$Discount/pi_hat)-1)*effect$`SMC Flag`)
+  return(wbp)
+}
+
+bs <- suppressWarnings(boot(msdata, SMC_prop, R = 1000))
+quantile(bs$t, probs = c(0.025, 0.975))
+
+com_prop <- function(data, indices){
+  data2 <- data[indices,]
+  set.seed(123)
+  inds <- sample(seq_len(nrow(data2)), size = nrow(data2)/2)
+  #split data into two folds
+  nuisance <- data2[inds,]
+  effect <- data2[-inds,]
+  
+  #estimate propensity score on nuisance fold
+  #model for the propensity score (logistic regression of treatment on all covariates)
+  prop_mod <- glm(Discount ~ .-Revenue, family = binomial(link="logit"), data = nuisance)
+  #predict propensity scores on effect fold
+  pi_hat <- predict(prop_mod, effect, type = "response")
+  #check weighted balancing property on effect fold
+  wbp <- mean(((effect$Discount/pi_hat)-1)*effect$`Commercial Flag`)
+  return(wbp)
+}
+
+bs <- suppressWarnings(boot(msdata, com_prop, R = 1000))
+quantile(bs$t, probs = c(0.025, 0.975))
+
+emp_prop <- function(data, indices){
+  data2 <- data[indices,]
+  set.seed(123)
+  inds <- sample(seq_len(nrow(data2)), size = nrow(data2)/2)
+  #split data into two folds
+  nuisance <- data2[inds,]
+  effect <- data2[-inds,]
+  
+  #estimate propensity score on nuisance fold
+  #model for the propensity score (logistic regression of treatment on all covariates)
+  prop_mod <- glm(Discount ~ .-Revenue, family = binomial(link="logit"), data = nuisance)
+  #predict propensity scores on effect fold
+  pi_hat <- predict(prop_mod, effect, type = "response")
+  #check weighted balancing property on effect fold
+  wbp <- mean(((effect$Discount/pi_hat)-1)*effect$`Employee Count`)
+  return(wbp)
+}
+
+bs <- suppressWarnings(boot(msdata, emp_prop, R = 1000))
+quantile(bs$t, probs = c(0.025, 0.975))
+
+size_prop <- function(data, indices){
+  data2 <- data[indices,]
+  set.seed(123)
+  inds <- sample(seq_len(nrow(data2)), size = nrow(data2)/2)
+  #split data into two folds
+  nuisance <- data2[inds,]
+  effect <- data2[-inds,]
+  
+  #estimate propensity score on nuisance fold
+  #model for the propensity score (logistic regression of treatment on all covariates)
+  prop_mod <- glm(Discount ~ .-Revenue, family = binomial(link="logit"), data = nuisance)
+  #predict propensity scores on effect fold
+  pi_hat <- predict(prop_mod, effect, type = "response")
+  #check weighted balancing property on effect fold
+  wbp <- mean(((effect$Discount/pi_hat)-1)*effect$Size)
+  return(wbp)
+}
+
+bs <- suppressWarnings(boot(msdata, size_prop, R = 1000))
+quantile(bs$t, probs = c(0.025, 0.975))
+```
+
+
+**Heatmap for Sensitivity Analysis**
 
 ```{r, eval=FALSE}
 ate_df <- data.frame(E0 = rep(E0, each = length(E1)),
