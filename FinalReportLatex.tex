@@ -102,7 +102,7 @@ The Inverse Probability Weighting (IPW) approach, which models the treatment ass
 \]
 The OR function in the OR Estimator represents the outcome mechanism while the propensity score in the IPW and Hajek Estimators represents the treatment assignment mechanism. We also estimate the ATE using the Doubly Robust (DR) Estimator which combines both information and is unbiased if either the OR function or the propensity score is correctly specified. Similar to the previous estimators, non-parametric bootstrap was used to estimate standard error and obtain confidence intervals.
 \[
-\hat{\theta}_{ATE}^{hajek} = \E_n\left[\frac{A\{Y-\mu(1,X;\hat{\beta})\}}{\pi(X;\hat{\alpha})} + \mu(1,X;\hat{\beta}) - \frac{(1-A)\{Y-\mu(0,X;\hat{\beta})\}}{1-\pi(X;\hat{\alpha})} - \mu(0,X;\hat{\beta})\right]
+\hat{\theta}_{ATE}^{dr} = \E_n\left[\frac{A\{Y-\mu(1,X;\hat{\beta})\}}{\pi(X;\hat{\alpha})} + \mu(1,X;\hat{\beta}) - \frac{(1-A)\{Y-\mu(0,X;\hat{\beta})\}}{1-\pi(X;\hat{\alpha})} - \mu(0,X;\hat{\beta})\right]
 \]
 The propensity score was estimated using logistic regression with an order 1 polynomial. For each of the covariates, the estimated propensity scores were used to calculate $\frac{1}{n}\sum_{i=1}^{n}\{\frac{A_i}{\hat{\pi}(x_i)}-1\}\hspace{0.1cm}X_{i_{p}}$ for $p$ = 1,2,...,6 for 6 predictors. Bootstrap was used to calculate 1000 of these values for each covariate and 95\% confidence intervals were produced. The results are shown in Table 2 below. From this table, we can see that the value 0 falls in every confidence interval which suggests that our estimator of the propensity score satisfies the weighted balancing property for each of the covariates.
 
