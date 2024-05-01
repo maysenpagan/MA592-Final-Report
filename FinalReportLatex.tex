@@ -31,8 +31,9 @@
 
 \begin{document}
 \maketitle
+
 \section{Introduction}
-In an era marked by the digital transformation of businesses, startups are increasingly reliant on strategic outreach efforts to both attract new customers and improve loyalty among existing ones. One such startup, specializing in software solutions, is looking to increase consumption among existing customers. This startup aims to boost usage among its existing customers by offering discounts. To gauge the impact of these discounts on customer usage, the company examines historical data from 2000 customers. The key variables in the dataset include a binary treatment variable indicating whether a customer received a discount and a response variable representing the revenue generated from software purchases in the year following the discount. Additionally, there are several pre-treatment covariates such as the number of PCs used by the customer, the company's employee count, the amount spent on IT purchases, the company's size (measured by total yearly revenue), and binary indicating factors which include whether the customer has global offices, is a large consumer, is a Small Medium Corporation, or has commerical business.
+In an era marked by the digital transformation of businesses, startups are increasingly reliant on strategic outreach efforts to both attract new customers and improve loyalty among existing ones. One such startup $^{[1]}$, specializing in software solutions, is looking to increase consumption among existing customers. This startup aims to boost usage among its existing customers by offering discounts. To gauge the impact of these discounts on customer usage, the company examines historical data from 2000 customers. The key variables in the dataset include a binary treatment variable indicating whether a customer received a discount and a response variable representing the revenue generated from software purchases in the year following the discount. Additionally, there are several pre-treatment covariates such as the number of PCs used by the customer, the company's employee count, the amount spent on IT purchases, the company's size (measured by total yearly revenue), and binary indicating factors which include whether the customer has global offices, is a large consumer, is a Small Medium Corporation, or has commerical business.
 
 \section{Exploratory Data Analysis}
 
@@ -133,7 +134,7 @@ The figures below display the ATE estimates as well as the bootstrap confidence 
   \includegraphics[width = 0.45\textwidth]{figs/dr.png}
 \end{figure}
 \subsection{Sensitivity Analysis}
-We then performed sensitivity analysis to observe the extent to which the Conditional Exchangeability assumption might be violated since this assumption can not be tested. We chose our sensitivity parameters to range from $\frac{1}{2}$ to 2 and the figure below is a heatmap of the calculated effects with certain combinations of these parameters. We can see from the bottom right corner of the heatmap that the signs of our ATEs are sensitive only for larger sensitivity parameters. This suggests that when customers who receive a discount tend to bring in more revenue (which means the sensitivity parameters are larger than 1), then our results are sensitive. On the other hand, for customers who receive a discount and tend to bring in less revenue, our results are not sensitive and we can conclude that there is a positive causal effect.
+We then performed sensitivity analysis to observe the extent to which the Conditional Exchangeability assumption might be violated since this assumption can not be tested. We chose our sensitivity parameters to range from $\frac{1}{2}$ to 2 and the figure below is a heatmap of the calculated effects with certain combinations of these parameters. We can see from the bottom right corner of the heatmap that the signs of our ATEs are sensitive only for larger sensitivity parameters. This suggests that when customers who receive a discount tend to bring in more revenue (which means the sensitivity parameters are larger than 1), then our results are sensitive. On the other hand, for customers who receive a discount and tend to bring in less revenue, our results are not sensitive and we can conclude that there is a positive causal effect $^{[2]}$.
 
 \begin{figure}[H]
   \centering
@@ -144,4 +145,12 @@ We then performed sensitivity analysis to observe the extent to which the Condit
 Our conducted causal analysis revealed a significant increase of approximately \$5,500 in revenue among customers who received the discount compared to those who did not. This indicates a positive average treatment effect of the discount on revenue generation. Through sensitivity analysis, we conclude that our estimated causal effect is primarily sensitive to only higher levels of unmeasured confounding. Despite this sensitivity, our analysis provides confidence in the existence of a causal effect, although the accuracy of the estimated ATE may be subject to some degree of inaccuracy.\\
 \\
 From this analysis, we learned the importance of visualizing and exploring the data prior to applying any causal inference frameworks. The data may contain missing or unusual values that may affect the analysis without our knowledge. Additionally, we learned how to apply the causal inference methods learned to real data. Exploring and understanding the data allowed us to determine which assumptions are satisfied and then apply a method that utilizes those assumptions to identify and estimate the average treatment effect. 
+
+\begin{thebibliography}{8}
+\bibitem{dataref}
+https://www.kaggle.com/datasets/hwwang98/software-usage-promotion-campaign-uplift-model
+
+\bibitem{sens}
+Ding, Peng. A First Course in Causal Inference. CRC Press LLC, 2024. 
+\end{thebibliography}
 \end{document}
